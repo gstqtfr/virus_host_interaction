@@ -11,8 +11,12 @@ scalaVersion := "2.13.1"
 libraryDependencies += "org.scalafx" %% "scalafx" % "14-R19"
 // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
 libraryDependencies += "org.deeplearning4j" % "deeplearning4j-core" % "0.9.1"
+// apparently, i need to "ensure that you have an nd4j backend on your classpath"
+libraryDependencies += "org.nd4j" % "nd4j-api" % "0.9.1"
+// https://mvnrepository.com/artifact/org.nd4j/nd4j-native-platform
+libraryDependencies += "org.nd4j" % "nd4j-native-platform" % "0.9.1"
 // https://mvnrepository.com/artifact/com.google.guava/guava
-libraryDependencies += "com.google.guava" % "guava" % "29.0-jre"
+//libraryDependencies += "com.google.guava" % "guava" % "29.0-jre"
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.3" % "test"  //scalacheck
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.0" % "test"     //scalatest
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"      //scalatest

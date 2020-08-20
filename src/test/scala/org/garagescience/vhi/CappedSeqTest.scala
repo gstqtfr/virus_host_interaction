@@ -97,16 +97,20 @@ object TestCappedSeq extends Properties("TortureTheFixedSeqCollection") {
 
     forAll(smallInt) { fixedSequenceLength: Int =>
 
-      object CreateFixedSeq1 extends
-        FixedSizeSeqFactory(capacity = fixedSequenceLength)
+      if (fixedSequenceLength == 0) {
+        true
+      } else {
+        object CreateFixedSeq1 extends
+          FixedSizeSeqFactory(capacity = fixedSequenceLength)
 
-      val _3AppendableSeq = CreateFixedSeq1.empty ++ {
-        for {x <- 1 to fixedSequenceLength+1} yield x
+        val _3AppendableSeq = CreateFixedSeq1.empty ++ {
+          for {x <- 1 to fixedSequenceLength + 1} yield x
+        }
+
+        _3AppendableSeq.head == 2
       }
 
-      _3AppendableSeq.head == 2
     }
-
   }
 
 

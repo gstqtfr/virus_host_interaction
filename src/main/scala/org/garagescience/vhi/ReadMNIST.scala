@@ -5,14 +5,12 @@ package org.garagescience.vhi
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator
 
 
-
-
 object ReadMNIST  {
 
-  private def getTrainData(batchSize: Int,
+  def getTrainData(batchSize: Int,
                            seed: Int = 42) = new MnistDataSetIterator(batchSize, true, seed)
 
-  private def getTestData(batchSize: Int,
+  def getTestData(batchSize: Int,
                           seed: Int = 42) = new MnistDataSetIterator(batchSize, false, seed)
 
   // Input image dimensions
@@ -25,7 +23,7 @@ object ReadMNIST  {
   val batchSize = 128
   val randomSeed = 42
 
-
+/*
   def main(args: Array[String]) = {
     println ("Loading data")
 
@@ -35,5 +33,7 @@ object ReadMNIST  {
 
     println ("Loaded data. See ya!")
   }
+
+ */
 
 }
