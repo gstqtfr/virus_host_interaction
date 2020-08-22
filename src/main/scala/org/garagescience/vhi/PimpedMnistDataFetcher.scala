@@ -1,6 +1,5 @@
 package org.garagescience.vhi
 
-
 import org.nd4j.linalg.dataset.api.DataSet
 import org.deeplearning4j.datasets.fetchers.MnistDataFetcher
 import org.deeplearning4j.datasets.mnist.MnistManager
@@ -31,10 +30,9 @@ object PimpedMnistDataFetcher {
      *
      * @param baseDirectory the directory for the standard mnist images, file names are assumed
      */
-    def getMnistImageData(baseDirectory: String): (IndexedSeq[Int], IndexedSeq[Int],
-        IndexedSeq[INDArray], IndexedSeq[INDArray]) = {
-
-      DataTypeUtil.setDTypeForContext("double")
+    def getMnistImageData(baseDirectory: String) = {
+      // let's get rid of this ...
+      // DataTypeUtil.setDTypeForContext("double")
       val testLabels = readLabels(s"$baseDirectory/t10k-labels-idx1-ubyte.gz")
       val trainingLabels = readLabels(s"$baseDirectory/train-labels-idx1-ubyte.gz")
       val testImages = readImages(s"$baseDirectory/t10k-images-idx3-ubyte.gz")
@@ -64,7 +62,7 @@ object PimpedMnistDataFetcher {
      */
     def readImages(filepath: String) = {
       // hmm ... let's think about this 'un, not sure this should be here At All ...
-      DataTypeUtil.setDTypeForContext("double")
+      // DataTypeUtil.setDTypeForContext("double")
       val g = gzipInputStream(filepath)
       val magicNumber = read32BitInt(g) //currently not used for anything, as assumptions are made
       val numberOfImages = read32BitInt(g)
@@ -72,7 +70,8 @@ object PimpedMnistDataFetcher {
       // unfortunately, this *requires* floaty-point numbers, so we can either:
       // a) deal with conversion at a later point, or
       // b) write the fucking thing myself ...
-      (1 to numberOfImages).map(_ => Nd4j.create((1 to imageSize).map(_ => g.read().toDouble).toArray))
+      // (1 to numberOfImages).map(_ => Nd4j.create((1 to imageSize).map(_ => g.read().toDouble).toArray))
+      (1 to numberOfImages).map(_ => (1 to imageSize).map(_ => g.read().toInt).toArray)
     }
 
   }
