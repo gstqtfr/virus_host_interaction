@@ -22,7 +22,7 @@ object VirusFactory {
     (xs.flatMap(x => toBitSetOption(x))).toVector
   }
 
-  def createViralStrain(sz: Int): SingleStranded = {
+  def createViralStrain: SingleStranded = {
     val genes: Vector[BitSet] = convertToBitSet
     val sequence: Vector[Int] = generateViralSequence
     SingleStranded(genes, sequence)

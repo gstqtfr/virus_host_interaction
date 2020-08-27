@@ -16,10 +16,10 @@ object PimpedMnistDataFetcher {
 
   import java.io.{BufferedInputStream, FileInputStream}
   import java.util.zip.GZIPInputStream
-
   import org.nd4j.linalg.factory.Nd4j
 
   object LoadMnist {
+
 
     private def gzipInputStream(s: String) = new GZIPInputStream(new BufferedInputStream(new FileInputStream(s)))
 
@@ -73,7 +73,6 @@ object PimpedMnistDataFetcher {
       // (1 to numberOfImages).map(_ => Nd4j.create((1 to imageSize).map(_ => g.read().toDouble).toArray))
       (1 to numberOfImages).map(_ => (1 to imageSize).map(_ => g.read().toInt).toArray)
     }
-
   }
 
 }

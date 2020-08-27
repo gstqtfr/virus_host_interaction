@@ -39,7 +39,6 @@ object ConvertIntegrals extends Properties("ConvertIntegrals") {
     }
   }
 
-
   property("turnTinyLittleLongsIntoBitSets") =
     forAll(smallLong) { input: Long =>
       convertLongToIntegral(input)
