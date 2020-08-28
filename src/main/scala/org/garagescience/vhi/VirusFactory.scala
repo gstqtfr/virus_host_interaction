@@ -1,16 +1,16 @@
 package org.garagescience.vhi
 
+import scala.annotation.tailrec
 import scala.collection.immutable.BitSet
 import scala.collection.immutable.Vector
-import FixedSizeSequence._
-import IntegralTypeOps.{toBitSet, toBitSetOption, wrapLong, wrapInt}
 
 object VirusFactory {
+
+  import IntegralTypeOps._
 
   val randomSequenceLength = 28 * 28
   val maxRandomShort = 255
   val randomShort = scala.util.Random
-  object CreateFixedSeq1 extends FixedSizeSeqFactory(capacity=randomSequenceLength)
 
   protected def generateViralSequence: Vector[Int] =
     (for (i <- 1 to randomSequenceLength) yield randomShort.nextInt(maxRandomShort)).toVector
@@ -35,14 +35,82 @@ object VirusFactory {
 
 }
 
+/*
+def mutate(mutations: Int): Int = mutations match {
+     case 0 => return 0
+     case _ => mutate(mutations-1)
+}
+ */
+
+
+/*
+
+def mutateHotspots(genesToMutate: List[Int],
+                    genes: Vector[BitSet]): Vector[BitSet] = {
+    genesToMutate match {
+         case Nil => genes
+         case x :: xs =>
+             println(genesToMutate(x))
+             println(x)
+             mutateHotspots(xs, genes)
+     }
+}
+
+
+ */
+
+
+// "final sealed" here?
+
 trait Virus[U] {
 
   def genes: Vector[U]
+  def length: Int
+}
+
+trait AdaptiveVirus extends Virus[BitSet] {
+
+  // protected? private[vhi]?
+
+  def getRandomGene = scala.util.Random.nextInt(genes.length)
+
+  //def getRandomSite(bits: BitSet) = scala.util.Random.nextInt(bits.toList.length)
+  def getRandomSite(bits: BitSet) = scala.util.Random.nextInt(length)
+
+  // this is a pre-selected BitSet
+  def mutate(bits: BitSet): BitSet = {
+    val mutant = BitSet(getRandomSite(bits))
+    bits ^ mutant
+  }
+
+  def mutateHotspots(originalGenes: Vector[BitSet],
+                     numberOfHotspots:Int=10): Vector[BitSet] = {
+    // @tailrec
+    def _mutateHotspots(genesToMutate: List[Int],
+                        genes: Array[BitSet]): Array[BitSet] = {
+      genesToMutate match {
+        case Nil => genes
+        case x :: xs =>
+          genes(x) = mutate(genes(x))
+          _mutateHotspots(xs, genes)
+      }
+    }
+
+    // make a copy of the genes that we're going to mutate
+    val genes = originalGenes.toArray
+    val randomGenes: List[Int] =
+      {for (i <- 1 to numberOfHotspots) yield getRandomGene}.toList
+    val mutatedGenes = _mutateHotspots(randomGenes, genes)
+    mutatedGenes.toVector
+  }
+
 }
 
 case class SingleStrandedWithSeq(val genes: Vector[BitSet],
-                                 val sequence: Vector[Int])  extends Virus[BitSet]
+                                 val sequence: Vector[Int],
+                                 val length: Int = 8)  extends AdaptiveVirus
 
-case class SingleStranded(val genes: Vector[BitSet]) extends Virus[BitSet]
+case class SingleStranded(val genes: Vector[BitSet],
+                          val length: Int = 8) extends AdaptiveVirus
 
 

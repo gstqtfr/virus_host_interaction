@@ -85,31 +85,10 @@ object CreateCompareAndEvolve {
     }
   }
 
-  // viralPopulation.map { v => getAffinityBetweenVirusAndImage(v.genes, batch_images(0)) }
-
-  /* grown-up version:
-
-  viralPopulation.map { v =>
-     val perImageAffinity = batch_images.map{ img =>
-            getAffinityBetweenVirusAndImage(v.genes, img)
-          }
-      perImageAffinity.foldLeft(0.0)(_ + _) / batch_images.length
-      }
-   */
-
-
-  // SingleStranded? maybe the parent class?
-  /*
-  def getMeanAffinityBetweenViralPopulationAndImages(viralPopulation: Vector[SingleStranded],
-                                                     images: Vector[BitSet]) = {
-    val populationAffinities = for (v <- viralPopulation) {
-      val affinities = for (img <- images) {
-        yield getAffinityBetweenVirusAndImage(v.genes, img)
-      }
-    }
-    populationAffinities
+  def medianAffinity(s: Seq[Double])  = {
+    val (lower, upper) = s.sortWith(_<_).splitAt(s.size / 2)
+    if (s.size % 2 == 0) (lower.last + upper.head) / 2.0 else upper.head
   }
-   */
 
   // where to find our images
   val baseDirectory = "/home/johnny/Data/mnist/MNIST/raw"
@@ -142,23 +121,24 @@ object CreateCompareAndEvolve {
 
       // do we need a groovy for-comp here?
 
-      for (v <- viralPopulation) {
-        for (img <- batch_images) {
-          yield getAffinityBetweenVirusAndImage(v, img)
-        }
-      }
+      val populationAffinities = getPopulationAffinity(viralPopulation, batch_images)
 
-/*
+      populationAffinities.foreach { println(_) }
 
-      for (v <- viralPopulation) {
-        for (img <- batch_images)
-          // now we need to get (& store) the affinity
-          yield getAffinity(v.genes, img)
-      }
+      val medianPopulationAffinity = medianAffinity(populationAffinities)
 
-*/
+      // this gets all the viral particles which have higher affinity than the
+      // median affinity. now i need to mutate 'em ...
+      val higherAffinityPopulation = populationAffinities.zipWithIndex.
+        filter { case (a: Double, b: Int) => a >= medianPopulationAffinity }.
+        map { case (a: Double, index: Int) => viralPopulation(index) }
 
+      // this creates new mutant versions of the viral pop.
+      // but let's finish this up tomorrow ...
+      higherAffinityPopulation.map { case v =>
+        SingleStranded(v.mutateHotspots(v.genes)) }
 
+      //
     }
 
   }
