@@ -22,25 +22,27 @@ object VirusFactory {
     (xs.flatMap(x => toBitSetOption(x))).toVector
   }
 
-  def createViralStrain: SingleStranded = {
+  def createViralStrainWithSeq: SingleStrandedWithSeq = {
     val genes: Vector[BitSet] = convertToBitSet
     val sequence: Vector[Int] = generateViralSequence
-    SingleStranded(genes, sequence)
+    SingleStrandedWithSeq(genes, sequence)
+  }
+
+  def createViralStrain: SingleStranded = {
+    val genes: Vector[BitSet] = convertToBitSet
+    SingleStranded(genes)
   }
 
 }
 
-trait Virus[U,V] {
+trait Virus[U] {
 
   def genes: Vector[U]
-  def sequence: Vector[V]
 }
 
-case class SingleStranded(val genes: Vector[BitSet],
-                          val sequence: Vector[Int])  extends Virus[BitSet, Int] {
-  // we need to have some score which
-  // shows how similar we are to the e.g. MNIST images
+case class SingleStrandedWithSeq(val genes: Vector[BitSet],
+                                 val sequence: Vector[Int])  extends Virus[BitSet]
 
-}
+case class SingleStranded(val genes: Vector[BitSet]) extends Virus[BitSet]
 
 
