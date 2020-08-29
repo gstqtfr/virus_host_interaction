@@ -2,7 +2,7 @@ package org.garagescience.vhi
 
 import scala.collection.immutable.BitSet
 import scala.collection.immutable.Vector
-import scala.collection.immutable.Seq
+import scala.collection.mutable.ArraySeq
 
 object ViralSubpopulations {
 
@@ -17,14 +17,15 @@ object ViralSubpopulations {
       map { case (digit, idx) => data(idx) }
   }
 
-  def createSubPopulations(subPopulationSize: Int=50): Seq[Array[SingleStranded]] = {
+  def createSubPopulations(subPopulationSize: Int=100): Array[Array[SingleStranded]] = {
     // create our subpopulations ...
     val subpops = Array.ofDim[SingleStranded](10, subPopulationSize)
     // ... then initialise them (very unScala, somehow, but it works just fine) ...
     for {i <- 0 to 9
          j <- 0 to subPopulationSize-1}
       subpops(i)(j) = createViralStrain
-    subpops.toSeq
+    //subpops.toArraySeq
+    subpops
   }
 
   def getBatch(sz: Int = 128,
@@ -55,7 +56,7 @@ object ViralSubpopulations {
     // we're going to be using subpopulations for viral species specialisation
     // so we need to enusre these guys are all in subpopulations themselves ...
 
-    val datatsetsByLabel = for (digit <- 0 to 9)
+    val datasetsByLabel = for (digit <- 0 to 9)
       yield createDatasetAccordingToLabel(digit, trainingLabels, trainingImages)
 
     // now we need to create a viral population, consisting of subpopulations, which
@@ -63,13 +64,15 @@ object ViralSubpopulations {
 
     // create our population of viruses
     // this is a var! a fucking *var*!!! WTActualF?!?!!?
-    var viralPopulation = createSubPopulations()
+    val viralPopulation = createSubPopulations()
 
-    for (iteration <- 1 to 2) {
+    for (iteration <- 1 to iterations) {
       // do stuff here ...
       for (label <- 0 to 9) {
         // here's out batch of labels & images
-        val _batch_images = getBatch(data = trainingImages)
+
+        // needs to be the datatsetsByLabel collection here ...
+        val _batch_images = getBatch(data = datasetsByLabel(label))
 
         // transform the images into bitsets ...
         val batch_images = batch2BitSet(_batch_images)
@@ -78,7 +81,7 @@ object ViralSubpopulations {
 
         // get the average population affinity ...
         val meanAffinity = populationAffinities.foldLeft(0.0)(_ + _) / populationAffinities.length
-        println(s"$iteration :  $meanAffinity")
+        println(s"$iteration : $label : $meanAffinity")
 
         val medianPopulationAffinity = medianAffinity(populationAffinities)
 
@@ -86,20 +89,13 @@ object ViralSubpopulations {
         // median affinity.
         val higherAffinityPopulation = populationAffinities.zipWithIndex.
           filter { case (a: Double, b: Int) => a >= medianPopulationAffinity }.
-          map { case (a: Double, index: Int) => viralPopulation(label)(index) }
+          map { case (a: Double, index: Int) => viralPopulation(label)(index) }.toArray
 
         // this creates a new population by taking the higher afinity subpop
         // and then creating new mutant versions of the viral pop.
-        // but let's finish this up tomorrow ...
+        viralPopulation(label) =
+          higherAffinityPopulation ++ higherAffinityPopulation.map { case v => SingleStranded(v.mutateHotspots(v.genes)) }
 
-        // fuck's sake. right. let's fuck about with this, then, shall we? (sigh ...)
-
-        /*
-        viralPopulation(label) = Array(higherAffinityPopulation) ++
-          Array(higherAffinityPopulation.map { case v => SingleStranded(v.mutateHotspots(v.genes)) })
-         */
-
-        viralPopulation(label) = higherAffinityPopulation
 
       }
 
