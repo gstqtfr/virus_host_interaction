@@ -35,31 +35,6 @@ object VirusFactory {
 
 }
 
-/*
-def mutate(mutations: Int): Int = mutations match {
-     case 0 => return 0
-     case _ => mutate(mutations-1)
-}
- */
-
-
-/*
-
-def mutateHotspots(genesToMutate: List[Int],
-                    genes: Vector[BitSet]): Vector[BitSet] = {
-    genesToMutate match {
-         case Nil => genes
-         case x :: xs =>
-             println(genesToMutate(x))
-             println(x)
-             mutateHotspots(xs, genes)
-     }
-}
-
-
- */
-
-
 // "final sealed" here?
 
 trait Virus[U] {
